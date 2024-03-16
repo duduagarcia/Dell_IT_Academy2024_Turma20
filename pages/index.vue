@@ -58,19 +58,30 @@ async function createNewEdition() {
     console.log("Erro ao criar edição");
   }
 }
+
+function selectRow(row) {
+  navigateTo(`/edicao/${row.id}`);
+}
 </script>
 
 <template>
   <UContainer class="h-screen flex justify-center p-8 gap-3 flex-col">
     <h1 class="text-3xl">Programa IT Academy #20 - Eduardo Amengual Garcia</h1>
     <br />
-    <UTable :rows="edicoes" :columns="columns" />
+    <UTable :rows="edicoes" :columns="columns" @select="selectRow" />
     <br />
     <UButton
       @click="createNewEdition"
-      size="md"
+      class="correction_button"
       label="Criar nova edição"
       :block="false"
     />
   </UContainer>
 </template>
+
+<style scoped>
+.correction_button {
+  width: max-content;
+  padding: 12px;
+}
+</style>
