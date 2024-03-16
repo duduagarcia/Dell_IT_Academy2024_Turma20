@@ -1,6 +1,6 @@
 <script setup>
 const userMain = useMainStore();
-const { user } = storeToRefs(userMain);
+const { currentEdicao } = storeToRefs(userMain);
 
 const { data } = await useFetch("/api/edicao/getAll");
 
@@ -53,6 +53,7 @@ async function createNewEdition() {
   if (data.value.status === 200) {
     console.log("Edição criada com sucesso");
     const id = data.value.edicao.id;
+    currentEdicao.value = data.value.edicao;
     navigateTo(`/edicao/${id}`);
   } else {
     console.log("Erro ao criar edição");
@@ -60,8 +61,13 @@ async function createNewEdition() {
 }
 
 function selectRow(row) {
+  currentEdicao.value = row;
   navigateTo(`/edicao/${row.id}`);
 }
+
+onMounted(() => {
+  currentEdicao.value = null;
+});
 </script>
 
 <template>

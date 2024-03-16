@@ -1,8 +1,12 @@
 <script setup>
+const userMain = useMainStore();
+const { currentEdicao } = storeToRefs(userMain);
 const route = useRoute();
-console.log("id: ", route.params.id);
+
+console.log("current edição ", currentEdicao.value);
 
 function goBackHome() {
+  currentEdicao.value = null;
   navigateTo("/");
 }
 </script>

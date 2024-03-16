@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
 
 export const useMainStore = defineStore("user", () => {
-  const user = ref({ name: "Eduardo" });
+  const currentEdicao = ref(null);
 
   return {
-    user,
+    currentEdicao,
   };
 });
