@@ -30,18 +30,26 @@ sistemas deverá funcionar em 4 fases:
 
 
 
-
-
-
-
-
-
-
-
-
-
 "Não é necessário gravar dados em nenhum formato, nem usar sistemas de banco 
 de dados. No entanto, se você quiser armazenar dados em um banco de dados, isso 
 contará pontos extra."
 
 
+WPpiKnsIU4QqeuTc = senha do banco
+
+
+
+edições
+
+- id
+- data
+- status
+- apostas
+- n° sorteados
+
+
+apostas
+- id
+- nome
+- cpf
+- número
