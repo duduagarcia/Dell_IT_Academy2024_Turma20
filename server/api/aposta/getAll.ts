@@ -3,9 +3,13 @@ import { serverSupabaseClient } from "#supabase/server";
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const body = await readBody(event);
-  console.log("body", body);
 
-  const { data } = await client.from("aposta").select("*");
+  const { data } = await client
+    .from("aposta")
+    .select("*")
+    .eq("id_edicao", body.edicao_id);
 
-  return { libraries: data };
+  console.log(data);
+
+  return { apostas: data };
 });

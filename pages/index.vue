@@ -1,7 +1,6 @@
 <script setup>
 const userMain = useMainStore();
 const { currentEdicao } = storeToRefs(userMain);
-
 const { data } = await useFetch("/api/edicao/getAll");
 
 const edicoes = [];
@@ -44,14 +43,11 @@ const columns = [
 ];
 
 async function createNewEdition() {
-  console.log("createNewEdition");
-
   const { data } = await useFetch("/api/edicao/postNewEdicao", {
     method: "POST",
   });
 
   if (data.value.status === 200) {
-    console.log("Edição criada com sucesso");
     const id = data.value.edicao.id;
     currentEdicao.value = data.value.edicao;
     navigateTo(`/edicao/${id}`);
