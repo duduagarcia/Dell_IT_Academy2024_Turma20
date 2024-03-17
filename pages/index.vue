@@ -12,8 +12,8 @@ data.value.edicoes.forEach((edicao) => {
     id: edicao.id,
     created_at: formatDate(edicao.created_at),
     finished: edicao.finished ? "Finalizado" : "Em andamento",
-    winners: edicao.winners,
-    drawn_numbers: edicao.drawn_numbers,
+    winners: edicao.winners.length,
+    drawn_numbers: edicao.drawn_numbers.length,
   });
 });
 
