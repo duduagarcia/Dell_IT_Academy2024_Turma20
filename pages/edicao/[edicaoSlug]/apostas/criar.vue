@@ -50,6 +50,7 @@ async function criarAposta() {
 }
 </script>
 
+<!-- template for a form to register the necessary data -->
 <template>
   <UContainer class="h-screen flex p-8 gap-3 flex-col">
     <div class="flex items-center gap-5">
@@ -120,6 +121,7 @@ async function criarAposta() {
 </template>
 
 <style scoped>
+/* facing a problem with NuxtUI button's size, so added this class to fix it */
 .correction_button {
   width: max-content;
   padding: 12px;

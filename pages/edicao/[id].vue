@@ -67,6 +67,7 @@ function criarAposta() {
 </template>
 
 <style scoped>
+/* facing a problem with NuxtUI button's size, so added this class to fix it */
 .correction_button {
   width: max-content;
   padding: 12px;
