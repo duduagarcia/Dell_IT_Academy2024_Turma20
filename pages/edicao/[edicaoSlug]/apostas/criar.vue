@@ -32,6 +32,10 @@ async function criarAposta() {
       title: "Aposta criada com sucesso",
       description: "Agora é só torcer!",
     });
+    state.cpf = "";
+    state.name = "";
+    state.numbers = [];
+    state.currentNumber = undefined;
   } else {
     toast.add({
       title: "Erro ao criar aposta",
