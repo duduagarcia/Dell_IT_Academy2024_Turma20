@@ -28,8 +28,8 @@ const columns = [
     label: "CPF",
   },
   {
-    key: "number",
-    label: "Número",
+    key: "numbers",
+    label: "Números",
   },
 ];
 
