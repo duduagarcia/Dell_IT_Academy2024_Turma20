@@ -1,5 +1,6 @@
 <script setup>
 const route = useRoute();
+const toast = useToast();
 
 function goBackHome() {
   navigateTo("/");
@@ -33,15 +34,35 @@ function criarAposta() {
   navigateTo(`/edicao/${route.params.id}/apostas/criar`);
 }
 
-function iniciarSorteio() {
+function redirectToSorteio() {
   navigateTo(`/edicao/${route.params.id}/sorteio`);
 }
+
+function iniciarSorteio() {
+  toast.add({
+    title: "Atenção",
+    actions,
+    description:
+      "Deseja iniciar o sorteio? uma vez com o sorteio iniciado não será mais possível cadastrar apostas",
+  });
+}
+
+const actions = ref([
+  {
+    label: "Confirmar",
+    click: () => redirectToSorteio(),
+  },
+  {
+    label: "Cancelar",
+    click: () => {},
+  },
+]);
 </script>
 
 <template>
   <UContainer class="h-screen flex p-8 gap-3 flex-col">
     <h1 class="my-7 text-2xl">Edição n° {{ route.params.id }}</h1>
-    <p>Lista de apostas até o momento</p>
+    <p>Apostas registradas até o momento</p>
     <UTable :rows="data.apostas" :columns="columns" />
     <div class="flex gap-2 my-3">
       <UButton
