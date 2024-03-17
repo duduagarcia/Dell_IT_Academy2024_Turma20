@@ -1,4 +1,7 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// Main nuxt configuration file
+// Here we define the modules and plugins we want to use in our app
+// Also we define the global css file we want to use
+// And the configuration for the supabase module
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [

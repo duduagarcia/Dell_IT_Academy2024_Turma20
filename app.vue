@@ -1,3 +1,4 @@
+<!-- Entry point  -->
 <template>
   <div>
     <NuxtPage />
