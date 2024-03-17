@@ -29,12 +29,12 @@ async function criarAposta() {
   // console.log(data);
 }
 
-const inputCPF = ref(null);
+// CPF mask and verification for better user experience
+const inputCPF = ref(null); // reference to the HTML element with vue `ref`
 function formatCPF() {
   state.cpf = state.cpf.replace(/[^\d]/g, "");
   verifyCPF();
 
-  // console.log(state.cpf);
   state.cpf = state.cpf.replace(/\D/g, "");
   state.cpf = state.cpf.replace(/(\d{3})(\d)/, "$1.$2");
   state.cpf = state.cpf.replace(/(\d{3})(\d)/, "$1.$2");
@@ -50,7 +50,8 @@ function verifyCPF() {
   watchFormControl();
 }
 
-const inputNumber = ref(null);
+// Number input verification and logic to add and remove numbers
+const inputNumber = ref(null); // reference to the HTML element with vue `ref`
 const lockNumberChange = ref(true);
 function verifyNumber() {
   if (state.currentNumber > 0 && state.currentNumber < 51) {
@@ -79,6 +80,7 @@ function removeNumber(index) {
   watchFormControl();
 }
 
+// Random number generator
 function surpresinha() {
   state.numbers = [];
   for (let i = 0; i < 5; i++) {
@@ -87,20 +89,19 @@ function surpresinha() {
   watchFormControl();
 }
 
+// Form control verification that will be triggered any functions that change the form data
 const formControl = ref(false);
 function watchFormControl() {
-  console.log(state.name, state.cpf.length, state.numbers.length);
-
+  // faced a problem with the CPF mask, so added this verification to ensure that the CPF is valid.
+  // it either has 11 (only numbers ###########) or 14 characters (with the mask ###.###.###-##)
   if (
     state.name &&
     (state.cpf.length === 11 || state.cpf.length === 14) &&
     state.numbers.length === 5
   ) {
     formControl.value = true;
-    console.log("formControl", formControl.value);
   } else {
     formControl.value = false;
-    console.log("formControl", formControl.value);
   }
 }
 </script>
@@ -113,6 +114,7 @@ function watchFormControl() {
       <h1 class="my-7 text-2xl">Criar aposta</h1>
     </div>
     <div class="max-w-md flex flex-col gap-5">
+      <!-- Input name input name that triggers a verification event (watchFormControl) when it is changed -->
       <UFormGroup label="Nome" required size="xl">
         <input
           class="w-full p-3 outline-none rounded-md input-border"
@@ -122,6 +124,7 @@ function watchFormControl() {
           @input="watchFormControl"
         />
       </UFormGroup>
+      <!-- Input CPF input that triggers a mask function for cpf when it is changed -->
       <UFormGroup label="CPF" required size="xl">
         <input
           class="w-full p-3 outline-none rounded-md input-border"
@@ -133,6 +136,7 @@ function watchFormControl() {
           ref="inputCPF"
         />
       </UFormGroup>
+      <!-- Input number with the necessary logic to ensure that only 5 numbers between 1 and 50 are typed  -->
       <UFormGroup
         label="Número"
         required
@@ -160,6 +164,7 @@ function watchFormControl() {
         :class="lockNumberChange ? 'disable' : ''"
       />
 
+      <!-- Selected numbers by the user  -->
       <div class="mb-5">
         <UKbd
           v-for="(number, index) in state.numbers"
