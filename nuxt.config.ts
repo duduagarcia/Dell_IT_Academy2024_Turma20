@@ -3,7 +3,7 @@
 // Also we define the global css file we want to use
 // And the configuration for the supabase module
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: [
     "@nuxt/ui",
     "@pinia/nuxt",

@@ -3,8 +3,8 @@ const route = useRoute();
 
 // Form data
 const state = reactive({
-  name: undefined,
-  cpf: undefined,
+  name: "",
+  cpf: "",
   currentNumber: undefined,
   numbers: [],
 });
@@ -13,17 +13,70 @@ function goBack() {
   navigateTo(`/edicao/${route.params.edicaoSlug}`);
 }
 
-// Adding numbers between 1 and 50 to the list select by the user
+async function criarAposta() {
+  console.log("SUBMIT", state);
+
+  // const { data } = await useFetch("/api/aposta/postNewAposta", {
+  //   method: "POST",
+  //   body: JSON.stringify({
+  //     edicao_id: route.params.edicaoSlug,
+  //     cpf: state.cpf,
+  //     name: state.name,
+  //     numbers: state.numbers,
+  //   }),
+  // });
+
+  // console.log(data);
+}
+
+const inputCPF = ref(null);
+function formatCPF() {
+  state.cpf = state.cpf.replace(/[^\d]/g, "");
+  verifyCPF();
+
+  // console.log(state.cpf);
+  state.cpf = state.cpf.replace(/\D/g, "");
+  state.cpf = state.cpf.replace(/(\d{3})(\d)/, "$1.$2");
+  state.cpf = state.cpf.replace(/(\d{3})(\d)/, "$1.$2");
+  state.cpf = state.cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+function verifyCPF() {
+  if (state.cpf.length === 11) {
+    inputCPF.value.style.border = "1px solid #333d4d";
+  } else {
+    inputCPF.value.style.border = "1px solid red";
+  }
+  watchFormControl();
+}
+
+const inputNumber = ref(null);
+const lockNumberChange = ref(true);
+function verifyNumber() {
+  if (state.currentNumber > 0 && state.currentNumber < 51) {
+    inputNumber.value.style.border = "1px solid #333d4d";
+    lockNumberChange.value = false;
+  } else {
+    inputNumber.value.style.border = "1px solid red";
+    lockNumberChange.value = true;
+  }
+  watchFormControl();
+}
+
 function addNumber() {
   if (state.numbers.length < 5) {
     if (state.currentNumber > 0 && state.currentNumber < 51) {
       state.numbers.push(state.currentNumber);
+      state.currentNumber = undefined;
+      lockNumberChange.value = true;
     }
   }
+  watchFormControl();
 }
 
 function removeNumber(index) {
   state.numbers.splice(index, 1);
+  watchFormControl();
 }
 
 function surpresinha() {
@@ -31,22 +84,24 @@ function surpresinha() {
   for (let i = 0; i < 5; i++) {
     state.numbers.push(Math.floor(Math.random() * 50) + 1);
   }
+  watchFormControl();
 }
 
-async function criarAposta() {
-  console.log(state);
+const formControl = ref(false);
+function watchFormControl() {
+  console.log(state.name, state.cpf.length, state.numbers.length);
 
-  const { data } = await useFetch("/api/aposta/postNewAposta", {
-    method: "POST",
-    body: JSON.stringify({
-      edicao_id: route.params.edicaoSlug,
-      cpf: state.cpf,
-      name: state.name,
-      numbers: state.numbers,
-    }),
-  });
-
-  console.log(data);
+  if (
+    state.name &&
+    (state.cpf.length === 11 || state.cpf.length === 14) &&
+    state.numbers.length === 5
+  ) {
+    formControl.value = true;
+    console.log("formControl", formControl.value);
+  } else {
+    formControl.value = false;
+    console.log("formControl", formControl.value);
+  }
 }
 </script>
 
@@ -59,14 +114,23 @@ async function criarAposta() {
     </div>
     <div class="max-w-md flex flex-col gap-5">
       <UFormGroup label="Nome" required size="xl">
-        <UInput placeholder="John Doe" type="text" v-model="state.name" />
+        <input
+          class="w-full p-3 outline-none rounded-md input-border"
+          type="text"
+          v-model="state.name"
+          placeholder="John Doe"
+          @input="watchFormControl"
+        />
       </UFormGroup>
       <UFormGroup label="CPF" required size="xl">
-        <UInput
-          placeholder="123.456.789-00"
+        <input
+          class="w-full p-3 outline-none rounded-md input-border"
           type="text"
           v-model="state.cpf"
+          @input="formatCPF()"
           maxlength="14"
+          placeholder="123.456.789-00"
+          ref="inputCPF"
         />
       </UFormGroup>
       <UFormGroup
@@ -75,18 +139,26 @@ async function criarAposta() {
         size="xl"
         hint="para remover um número, clique em cima dele"
       >
-        <UInput
+        <input
+          class="w-full p-3 outline-none rounded-md input-border"
           placeholder="23"
           min="1"
           max="50"
           pattern="\d{1,2}|50"
           type="number"
           v-model="state.currentNumber"
+          @input="verifyNumber"
+          ref="inputNumber"
+          :class="state.numbers.length == 5 ? 'disable' : ''"
         />
       </UFormGroup>
-      <UButton variant="link" class="correction_button" @click="addNumber">
-        Adicionar número
-      </UButton>
+      <UButton
+        variant="link"
+        class="correction_button"
+        @click="addNumber"
+        label="Adicionar número"
+        :class="lockNumberChange ? 'disable' : ''"
+      />
 
       <div class="mb-5">
         <UKbd
@@ -112,9 +184,9 @@ async function criarAposta() {
           size="sm"
           @click="criarAposta"
           class="correction_button"
-        >
-          Criar
-        </UButton>
+          :class="!formControl ? 'disable' : ''"
+          label="Criar"
+        />
       </div>
     </div>
   </UContainer>
@@ -125,5 +197,15 @@ async function criarAposta() {
 .correction_button {
   width: max-content;
   padding: 12px;
+}
+
+.input-border {
+  border: 1px solid #333d4d;
+}
+
+.disable {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
