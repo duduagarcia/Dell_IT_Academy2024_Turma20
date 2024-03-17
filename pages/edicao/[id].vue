@@ -75,12 +75,17 @@ function iniciarSorteio() {
     });
     return;
   }
-  toast.add({
-    title: "Atenção",
-    actions,
-    description:
-      "Deseja iniciar o sorteio? uma vez com o sorteio iniciado não será mais possível cadastrar apostas",
-  });
+
+  if (current_edicao.started_drawn == true) {
+    redirectToSorteio();
+  } else {
+    toast.add({
+      title: "Atenção",
+      actions,
+      description:
+        "Deseja iniciar o sorteio? uma vez com o sorteio iniciado não será mais possível cadastrar apostas",
+    });
+  }
 }
 
 const actions = ref([
