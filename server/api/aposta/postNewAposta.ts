@@ -10,13 +10,11 @@ export default defineEventHandler(async (event) => {
       {
         id_edicao: body.edicao_id,
         cpf: body.cpf,
-        number: body.number,
+        numbers: body.numbers,
         name: body.name,
       },
     ])
     .select("*");
-
-  console.log(data, error);
 
   let status = 200;
 

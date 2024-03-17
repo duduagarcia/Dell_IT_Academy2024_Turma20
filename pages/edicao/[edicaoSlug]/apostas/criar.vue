@@ -16,17 +16,17 @@ function goBack() {
 async function criarAposta() {
   console.log("SUBMIT", state);
 
-  // const { data } = await useFetch("/api/aposta/postNewAposta", {
-  //   method: "POST",
-  //   body: JSON.stringify({
-  //     edicao_id: route.params.edicaoSlug,
-  //     cpf: state.cpf,
-  //     name: state.name,
-  //     numbers: state.numbers,
-  //   }),
-  // });
+  const { data } = await useFetch("/api/aposta/postNewAposta", {
+    method: "POST",
+    body: JSON.stringify({
+      edicao_id: route.params.edicaoSlug,
+      cpf: state.cpf,
+      name: state.name,
+      numbers: state.numbers,
+    }),
+  });
 
-  // console.log(data);
+  console.log(data);
 }
 
 // CPF mask and verification for better user experience
