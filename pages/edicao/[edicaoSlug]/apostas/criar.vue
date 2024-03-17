@@ -1,5 +1,6 @@
 <script setup>
 const route = useRoute();
+const toast = useToast();
 
 // Form data
 const state = reactive({
@@ -26,6 +27,18 @@ async function criarAposta() {
     }),
   });
 
+  if (data.value.status === 200) {
+    toast.add({
+      title: "Aposta criada com sucesso",
+      description: "Agora é só torcer!",
+    });
+  } else {
+    toast.add({
+      title: "Erro ao criar aposta",
+      description: "Tente novamente mais tarde",
+      color: "red",
+    });
+  }
   console.log(data);
 }
 

@@ -4,6 +4,8 @@
 const userMain = useMainStore();
 const { currentEdicao } = storeToRefs(userMain);
 
+const toast = useToast();
+
 // getting all edicoes from the API
 const { data } = await useFetch("/api/edicao/getAll");
 
@@ -57,9 +59,17 @@ async function createNewEdition() {
   if (data.value.status === 200) {
     const id = data.value.edicao.id;
     currentEdicao.value = data.value.edicao;
+    toast.add({
+      title: "Edição criada com sucesso",
+      description: "Agora é só apostar!",
+    });
     navigateTo(`/edicao/${id}`);
   } else {
-    console.log("Erro ao criar edição");
+    toast.add({
+      title: "Erro ao criar edição",
+      description: "Tente novamente mais tarde",
+      color: "red",
+    });
   }
 }
 
