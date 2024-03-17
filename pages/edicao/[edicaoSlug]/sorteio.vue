@@ -49,15 +49,15 @@ function start() {
   //    It may happen that you make several attempts at the draw and no winner comes out, if you want to force a winner and confirm that the code works, manually add the combination you want here in the position of the draw you want
 
   // Choose the position you want, EX: The TENTH number generated from the draw must be the ont you set here
-  let position = 10;
+  let position = 4;
   if (drawnNumbers_list.value.length == position - 1) {
-    drawnNumbers_list.value.push([49, 36, 37, 44, 2]);
+    drawnNumbers_list.value.push([8, 33, 1, 1, 19]);
   } else {
     drawnNumbers_list.value.push(numbers);
   }
 
-  //   Real line
-  //   drawnNumbers_list.value.push(numbers);
+  //  Comment this line if you want to use the manual draw
+  // drawnNumbers_list.value.push(numbers);
 
   for (let i = drawnNumbers_list.value.length - 1; i >= 0; i--) {
     let DRAWN_NUMBERS = drawnNumbers_list.value[i];
@@ -101,6 +101,7 @@ function start() {
   }
 }
 
+const disableBtn = ref(true);
 async function saveDataOnBD() {
   const { data } = await useFetch("/api/edicao/sorteio", {
     method: "POST",
@@ -111,7 +112,9 @@ async function saveDataOnBD() {
     }),
   });
 
-  console.log("response at the end", data.value);
+  if (data.value.status == 200) {
+    disableBtn.value = false;
+  }
 }
 
 // Função auxiliar para contar as ocorrências de cada elemento em um vetor
@@ -146,6 +149,7 @@ function countOccurrences(arr) {
         >
       </div>
       <UButton
+        v-if="disableBtn"
         class="correction_button mr-5"
         variant="solid"
         label="Iniciar Sorteio"
