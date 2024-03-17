@@ -7,7 +7,9 @@ export default defineEventHandler(async (event) => {
   // by default, the new edition is not finished, has no winners and no drawn numbers
   const { data, error } = await supabase
     .from("edicao")
-    .insert([{ finished: false, winners: [], drawn_numbers: [] }])
+    .insert([
+      { finished: false, winners: [], drawn_numbers: [], started_drawn: false },
+    ])
     .select("*");
 
   const edicao = data[0];

@@ -11,6 +11,15 @@ const { data } = await useFetch("/api/aposta/getAll", {
   body: JSON.stringify({ edicao_id: route.params.id }),
 });
 
+const edicao_model = await useFetch("/api/edicao/getCurrentEdicao", {
+  method: "POST",
+  body: JSON.stringify({ id: route.params.id }),
+});
+
+const current_edicao = edicao_model.data.value.edicao[0];
+
+console.log(current_edicao);
+
 const columns = [
   {
     key: "id",
@@ -34,11 +43,38 @@ function criarAposta() {
   navigateTo(`/edicao/${route.params.id}/apostas/criar`);
 }
 
-function redirectToSorteio() {
+async function redirectToSorteio() {
+  const { data } = await useFetch("/api/edicao/startSorteio", {
+    method: "POST",
+    body: JSON.stringify({ id: route.params.id }),
+  });
+
+  if (data.value.status === 200) {
+    toast.add({
+      title: "Sucesso!",
+      description: "Fase de sorteio iniciado com sucesso",
+      color: "green",
+    });
+  } else {
+    toast.add({
+      title: "ERRO!",
+      description: "Não foi possível iniciar o sorteio",
+      color: "red",
+    });
+  }
+
   navigateTo(`/edicao/${route.params.id}/sorteio`);
 }
 
 function iniciarSorteio() {
+  if (data.value.apostas?.length === 0 || data.value.apostas === undefined) {
+    toast.add({
+      title: "ERRO!",
+      description: "Não é possível iniciar o sorteio sem apostas cadastradas",
+      color: "red",
+    });
+    return;
+  }
   toast.add({
     title: "Atenção",
     actions,
@@ -76,12 +112,14 @@ const actions = ref([
         variant="outline"
         label="Criar aposta"
         @click="criarAposta"
+        :class="current_edicao.started_drawn ? 'disable' : ''"
       />
       <UButton
         class="correction_button"
         variant="solid"
         label="Iniciar sorteio"
         @click="iniciarSorteio"
+        :class="current_edicao.finished ? 'disable' : ''"
       />
     </div>
   </UContainer>
@@ -92,5 +130,11 @@ const actions = ref([
 .correction_button {
   width: max-content;
   padding: 12px;
+}
+
+.disable {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

@@ -12,6 +12,7 @@ data.value.edicoes.forEach((edicao) => {
     id: edicao.id,
     created_at: formatDate(edicao.created_at),
     finished: edicao.finished ? "Finalizado" : "Em andamento",
+    status: edicao.started_drawn ? "Sorteio" : "Apostas abertas",
     winners: edicao.winners.length,
     drawn_numbers: edicao.drawn_numbers.length,
   });
@@ -34,6 +35,10 @@ const columns = [
   {
     key: "finished",
     label: "Status",
+  },
+  {
+    key: "status",
+    label: "Fase",
   },
   {
     key: "winners",
