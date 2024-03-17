@@ -1,9 +1,5 @@
 <script setup>
-const userMain = useMainStore();
-const { currentEdicao } = storeToRefs(userMain);
 const route = useRoute();
-
-console.log(currentEdicao.value);
 
 function goBackHome() {
   navigateTo("/");
@@ -36,6 +32,10 @@ const columns = [
 function criarAposta() {
   navigateTo(`/edicao/${route.params.id}/apostas/criar`);
 }
+
+function iniciarSorteio() {
+  navigateTo(`/edicao/${route.params.id}/sorteio`);
+}
 </script>
 
 <template>
@@ -55,12 +55,12 @@ function criarAposta() {
         variant="outline"
         label="Criar aposta"
         @click="criarAposta"
-        :block="currentEdicao.finished == 'Finalizado' ? true : false"
       />
       <UButton
         class="correction_button"
         variant="solid"
         label="Iniciar sorteio"
+        @click="iniciarSorteio"
       />
     </div>
   </UContainer>

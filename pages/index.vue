@@ -1,9 +1,5 @@
 <!-- The first page of the app -->
 <script setup>
-// Importing and setting up the pinia store
-const userMain = useMainStore();
-const { currentEdicao } = storeToRefs(userMain);
-
 const toast = useToast();
 
 // getting all edicoes from the API
@@ -16,8 +12,8 @@ data.value.edicoes.forEach((edicao) => {
     id: edicao.id,
     created_at: formatDate(edicao.created_at),
     finished: edicao.finished ? "Finalizado" : "Em andamento",
-    winners: edicao.winners.length,
-    drawn_numbers: edicao.drawn_numbers.length,
+    winners: edicao.winners,
+    drawn_numbers: edicao.drawn_numbers,
   });
 });
 
@@ -55,10 +51,9 @@ async function createNewEdition() {
     method: "POST",
   });
 
-  // if the API returns a 200 status, redirect to it's page and set the currentEdicao
+  // if the API returns a 200 status, redirect to it's page
   if (data.value.status === 200) {
     const id = data.value.edicao.id;
-    currentEdicao.value = data.value.edicao;
     toast.add({
       title: "Edição criada com sucesso",
       description: "Agora é só apostar!",
@@ -75,14 +70,8 @@ async function createNewEdition() {
 
 // function to select a row in the table and navigate to it's page
 function selectRow(row) {
-  currentEdicao.value = row;
   navigateTo(`/edicao/${row.id}`);
 }
-
-// setting the currentEdicao to null when the component is mounted (basic reset)
-onMounted(() => {
-  currentEdicao.value = null;
-});
 </script>
 
 <template>
