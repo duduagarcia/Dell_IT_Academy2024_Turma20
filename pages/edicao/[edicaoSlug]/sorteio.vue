@@ -49,9 +49,9 @@ function start() {
   //    It may happen that you make several attempts at the draw and no winner comes out, if you want to force a winner and confirm that the code works, manually add the combination you want here in the position of the draw you want
 
   // Choose the position you want, EX: The TENTH number generated from the draw must be the ont you set here
-  let position = 4;
+  let position = 18;
   if (drawnNumbers_list.value.length == position - 1) {
-    drawnNumbers_list.value.push([8, 33, 1, 1, 19]);
+    drawnNumbers_list.value.push([1, 2, 3, 4, 5]);
   } else {
     drawnNumbers_list.value.push(numbers);
   }

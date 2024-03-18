@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
     .from("edicao")
     .update({
       winners: winners,
-      status: body.status,
       drawn_numbers: body.numbers,
+      finished: true,
     })
     .eq("id", body.id)
     .select();

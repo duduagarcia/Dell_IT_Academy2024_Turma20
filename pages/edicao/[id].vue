@@ -1,4 +1,6 @@
 <script setup>
+import { ref } from "vue";
+
 const route = useRoute();
 const toast = useToast();
 
@@ -6,19 +8,72 @@ function goBackHome() {
   navigateTo("/");
 }
 
-const { data } = await useFetch("/api/aposta/getAll", {
+let allApostas = await useFetch("/api/aposta/getAll", {
   method: "POST",
   body: JSON.stringify({ edicao_id: route.params.id }),
 });
 
-const edicao_model = await useFetch("/api/edicao/getCurrentEdicao", {
+allApostas = allApostas.data.value.apostas;
+
+console.log("all apostas", allApostas);
+
+let current_edicao = await useFetch("/api/edicao/getCurrentEdicao", {
   method: "POST",
   body: JSON.stringify({ id: route.params.id }),
 });
 
-const current_edicao = edicao_model.data.value.edicao[0];
+current_edicao = current_edicao.data.value.edicao[0];
 
-console.log(current_edicao);
+console.log("current_edicao", current_edicao);
+let apostasWinners = [];
+const numbers_wCount = ref([]);
+
+if (current_edicao.finished == true) {
+  const { data } = await useFetch("/api/aposta/getWinners", {
+    method: "POST",
+    body: JSON.stringify({ ids_apostas: current_edicao.winners }),
+  });
+
+  apostasWinners = data.value.apostas;
+
+  apostasWinners.sort((a, b) => {
+    if (a.name < b.name) {
+      return -1;
+    }
+    if (a.name > b.name) {
+      return 1;
+    }
+    return 0;
+  });
+
+  // No momento pegamos apenas as apostas vencedoreas, devo pegar todas as apostas do sorteio
+  let numbers = [];
+  allApostas.forEach((aposta) => {
+    aposta.numbers.forEach((number) => {
+      if (!numbers.includes(number)) {
+        numbers.push(number);
+
+        numbers_wCount.value.push({
+          number: number,
+          count: 1,
+        });
+      }
+    });
+  });
+
+  numbers_wCount.value.forEach((number) => {
+    let count = 0;
+    allApostas.forEach((aposta) => {
+      if (aposta.numbers.includes(number.number)) {
+        count++;
+      }
+    });
+
+    number.count = count;
+  });
+
+  console.log("numbers_wCount", numbers_wCount.value);
+}
 
 const columns = [
   {
@@ -36,6 +91,17 @@ const columns = [
   {
     key: "numbers",
     label: "Números",
+  },
+];
+
+const columns_numberFrequency = [
+  {
+    key: "number",
+    label: "Número",
+  },
+  {
+    key: "count",
+    label: "Frequência",
   },
 ];
 
@@ -101,10 +167,46 @@ const actions = ref([
 </script>
 
 <template>
-  <UContainer class="h-screen flex p-8 gap-3 flex-col">
+  <UContainer class="flex p-8 gap-3 flex-col">
     <h1 class="my-7 text-2xl">Edição n° {{ route.params.id }}</h1>
-    <p>Apostas registradas até o momento</p>
-    <UTable :rows="data.apostas" :columns="columns" />
+    <div v-if="current_edicao.finished == true" class="mb-5">
+      <p class="mb-4">Lista de números sorteados</p>
+      <div class="flex gap-4 flex-wrap">
+        <UBadge
+          color="primary"
+          variant="subtle"
+          size="lg"
+          v-for="(sequence, index) in current_edicao.drawn_numbers"
+          :key="index"
+          >{{ sequence }}</UBadge
+        >
+      </div>
+      <p class="my-4">
+        Quantidade de rodadas do sorteio realizadas:
+        {{ current_edicao.drawn_numbers.length }}
+      </p>
+      <p class="my-4">
+        Quantidade de apostas vencedoras:
+        {{ current_edicao.winners.length }}
+      </p>
+      <br />
+      <p class="text-lg">Vencedores</p>
+      <UTable
+        :rows="apostasWinners"
+        :columns="columns"
+        v-if="apostasWinners.length > 0"
+      />
+      <p class="font-bold" v-else>
+        Não houve vencedores nessa edição do sorteio!
+      </p>
+      <br />
+      <p class="text-lg">Frequência dos números escolhidos</p>
+      <UTable :rows="numbers_wCount" :columns="columns_numberFrequency" />
+    </div>
+    <div v-else-if="current_edicao.finished == false">
+      <p>Apostas registradas até o momento</p>
+      <UTable :rows="allApostas" :columns="columns" />
+    </div>
     <div class="flex gap-2 my-3">
       <UButton
         class="correction_button"
