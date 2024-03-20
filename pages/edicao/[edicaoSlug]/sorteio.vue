@@ -1,6 +1,5 @@
 <script setup>
-import { ref } from "vue";
-
+const toast = useToast();
 const route = useRoute();
 
 function goBack() {
@@ -36,66 +35,52 @@ const columns = [
   },
 ];
 
-const drawnNumbers_list = ref([]);
+const drawn_numbers = ref([]);
 const winners = ref([]);
+const rounds = ref(0);
 
 function start() {
-  const numbers = [];
-  for (let i = 0; i < 5; i++) {
-    numbers.push(Math.floor(Math.random() * 50) + 1);
+  if (drawn_numbers.value.length == 0) {
+    for (let i = 0; i < 5; i++) {
+      drawn_numbers.value.push(Math.floor(Math.random() * 50) + 1);
+    }
+  } else if (rounds.value <= 25) {
+    drawn_numbers.value.push(Math.floor(Math.random() * 50) + 1);
   }
 
-  //   !! ATTENTION !!
-  //    It may happen that you make several attempts at the draw and no winner comes out, if you want to force a winner and confirm that the code works, manually add the combination you want here in the position of the draw you want
+  for (let i = 0; i < apostas.length; i++) {
+    const numbers = apostas[i].numbers;
 
-  // Choose the position you want, EX: The TENTH number generated from the draw must be the ont you set here
-  // let position = 18;
-  // if (drawnNumbers_list.value.length == position - 1) {
-  //   drawnNumbers_list.value.push([1, 2, 3, 4, 5]);
-  // } else {
-  //   drawnNumbers_list.value.push(numbers);
-  // }
-
-  //  Comment this line if you want to use the manual draw
-  drawnNumbers_list.value.push(numbers);
-
-  for (let i = drawnNumbers_list.value.length - 1; i >= 0; i--) {
-    let DRAWN_NUMBERS = drawnNumbers_list.value[i];
-    // console.log(`COMPARANDO COM O NÚMERO ${DRAWN_NUMBERS}`);
-    for (let j = 0; j < apostas.length; j++) {
-      let apostasNumbers = apostas[j].numbers;
-
-      // Conta a quantidade de ocorrências de cada número na lista sorteada e na aposta
-      const drawnCounts = countOccurrences(DRAWN_NUMBERS);
-      const apostaCounts = countOccurrences(apostasNumbers);
-
-      // Verifica se todos os números sorteados estão presentes na aposta e não excedem a quantidade de ocorrências no sorteio
-      let allHits = true;
-      for (const [number, count] of Object.entries(drawnCounts)) {
-        if (!(number in apostaCounts) || apostaCounts[number] < count) {
-          allHits = false;
-          break;
-        }
+    let hits = 0;
+    for (let j = 0; j < drawn_numbers.value.length; j++) {
+      if (numbers.includes(drawn_numbers.value[j])) {
+        hits++;
       }
+    }
 
-      if (allHits) {
-        winners.value.push(apostas[j]);
-        // console.log(`Aposta ${j + 1} é uma ganhadora!`);
-      } else {
-        // console.log(`Aposta ${j + 1} é uma perdedora.`);
-      }
+    if (hits === 5) {
+      winners.value.push(apostas[i]);
     }
   }
 
   if (winners.value.length > 0) {
-    console.log("Os ganhadores são: ", winners.value);
+    console.log(winners.value);
+    toast.add({
+      title: "Sorteio finalizado",
+      description: "Há vencedores para premiar!",
+      color: "green",
+    });
     saveDataOnBD();
   } else {
-    console.log("Não houve ganhadores.");
-    if (drawnNumbers_list.value.length < 25) {
+    if (rounds.value <= 25) {
+      rounds.value++;
       start();
     } else {
-      console.log("Fim do sorteio");
+      toast.add({
+        title: "Sorteio finalizado",
+        description: "Não há vencedores para premiar!",
+        color: "yellow",
+      });
       saveDataOnBD();
     }
   }
@@ -108,22 +93,13 @@ async function saveDataOnBD() {
     body: JSON.stringify({
       id: route.params.edicaoSlug,
       winners: winners.value,
-      numbers: drawnNumbers_list.value,
+      numbers: drawn_numbers.value,
     }),
   });
 
   if (data.value.status == 200) {
     disableBtn.value = false;
   }
-}
-
-// Função auxiliar para contar as ocorrências de cada elemento em um vetor
-function countOccurrences(arr) {
-  const counts = {};
-  for (const num of arr) {
-    counts[num] = (counts[num] || 0) + 1;
-  }
-  return counts;
 }
 </script>
 
@@ -136,14 +112,12 @@ function countOccurrences(arr) {
       </h1>
     </div>
     <div class="mb-8">
-      <h2 class="text-4xl mb-6">Número sorteado</h2>
+      <h2 class="text-4xl mb-6">Números sorteado</h2>
       <div class="mb-5">
         <UKbd
-          v-for="(number, index) in drawnNumbers_list[
-            drawnNumbers_list.length - 1
-          ]"
+          v-for="(number, index) in drawn_numbers"
           :key="index"
-          class="mr-4"
+          class="mt-2 mb-2 mr-2"
           size="md"
           >{{ number }}</UKbd
         >
@@ -156,18 +130,6 @@ function countOccurrences(arr) {
         @click="start"
       />
     </div>
-    <p>Números sorteados anteriormente</p>
-    <div class="flex gap-4 flex-wrap">
-      <UBadge
-        color="primary"
-        variant="subtle"
-        size="lg"
-        v-for="(sequence, index) in drawnNumbers_list"
-        :key="index"
-        >{{ sequence }}</UBadge
-      >
-    </div>
-    <br />
     <h2 class="text-4xl mb-6">Todas as apostas</h2>
     <UTable :rows="apostas" :columns="columns" />
   </UContainer>

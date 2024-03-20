@@ -1,6 +1,4 @@
 <script setup>
-import { ref } from "vue";
-
 const route = useRoute();
 const toast = useToast();
 
@@ -164,6 +162,11 @@ const actions = ref([
     click: () => {},
   },
 ]);
+
+function selectWinner(row) {
+  console.log("row", row);
+  navigateTo(`/edicao/${route.params.id}/apostas/${row.id}/premiacao`);
+}
 </script>
 
 <template>
@@ -183,7 +186,7 @@ const actions = ref([
       </div>
       <p class="my-4">
         Quantidade de rodadas do sorteio realizadas:
-        {{ current_edicao.drawn_numbers.length }}
+        {{ current_edicao.drawn_numbers.length - 5 }}
       </p>
       <p class="my-4">
         Quantidade de apostas vencedoras:
@@ -195,6 +198,7 @@ const actions = ref([
         :rows="apostasWinners"
         :columns="columns"
         v-if="apostasWinners.length > 0"
+        @select="selectWinner"
       />
       <p class="font-bold" v-else>
         Não houve vencedores nessa edição do sorteio!
