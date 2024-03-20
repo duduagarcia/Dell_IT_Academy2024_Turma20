@@ -133,7 +133,7 @@ async function redirectToSorteio() {
 }
 
 function iniciarSorteio() {
-  if (data.value.apostas?.length === 0 || data.value.apostas === undefined) {
+  if (allApostas.length === 0 || allApostas === undefined) {
     toast.add({
       title: "ERRO!",
       description: "Não é possível iniciar o sorteio sem apostas cadastradas",
