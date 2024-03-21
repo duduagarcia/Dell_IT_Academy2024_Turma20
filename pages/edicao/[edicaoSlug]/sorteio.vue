@@ -1,3 +1,4 @@
+<!-- Página do sorteio -->
 <script setup>
 const toast = useToast();
 const route = useRoute();
@@ -6,6 +7,7 @@ function goBack() {
   navigateTo(`/edicao/${route.params.edicaoSlug}`);
 }
 
+// Pegando todas as apostas da Edição para visualização do usuário
 const { data } = await useFetch("/api/aposta/getAll", {
   method: "POST",
   body: JSON.stringify({ edicao_id: route.params.edicaoSlug }),
@@ -16,6 +18,7 @@ data.value.apostas.forEach((aposta) => {
   apostas.push(aposta);
 });
 
+// Template das colunas da tabela
 const columns = [
   {
     key: "id",
@@ -35,11 +38,13 @@ const columns = [
   },
 ];
 
-const drawn_numbers = ref([]);
+const drawn_numbers = ref([]); // Números sorteados
 const winners = ref([]);
-const rounds = ref(0);
+const rounds = ref(0); //Controle de rodadas
 
+// Função para iniciar o sorteio (recursiva)
 function start() {
+  // Se for a primeira rodada, sorteamos 5 números diretos, caso contrário E, não tenha ocorrido mais de 25 rodadas, sorteamos apenas 1 número e o adicionamos no vetor
   if (drawn_numbers.value.length == 0) {
     for (let i = 0; i < 5; i++) {
       drawn_numbers.value.push(Math.floor(Math.random() * 50) + 1);
@@ -49,20 +54,24 @@ function start() {
   }
 
   for (let i = 0; i < apostas.length; i++) {
+    // Pega os números da aposta
     const numbers = apostas[i].numbers;
 
     let hits = 0;
+    // Verifica quantos números da aposta estão nos números sorteados
     for (let j = 0; j < drawn_numbers.value.length; j++) {
       if (numbers.includes(drawn_numbers.value[j])) {
         hits++;
       }
     }
 
+    // Se tivermos 5 acertos, quer dizer que todos os números da aposta estão nos números sorteados, consequentemente temos um vencedor
     if (hits === 5) {
       winners.value.push(apostas[i]);
     }
   }
 
+  // Se houver vencedores, finalizamos o sorteio e mostramos um toast para o usuário e salvamos no banco
   if (winners.value.length > 0) {
     console.log(winners.value);
     toast.add({
@@ -72,10 +81,12 @@ function start() {
     });
     saveDataOnBD();
   } else {
+    // Caso não haja vencedores e não tenha ocorrido mais de 25 rodadas, incrementamos o número de rodadas e chamamos a função novamente
     if (rounds.value <= 25) {
       rounds.value++;
       start();
     } else {
+      // Caso não haja vencedores e tenha ocorrido mais de 25 rodadas, finalizamos o sorteio e mostramos um toast para o usuário e salvamos no banco
       toast.add({
         title: "Sorteio finalizado",
         description: "Não há vencedores para premiar!",
@@ -86,6 +97,7 @@ function start() {
   }
 }
 
+// Salvar os dados do sorteio no banco de dados e desativar quaisquer possíveis interações da página para que o usuário saia dela
 const disableBtn = ref(true);
 async function saveDataOnBD() {
   const { data } = await useFetch("/api/edicao/sorteio", {

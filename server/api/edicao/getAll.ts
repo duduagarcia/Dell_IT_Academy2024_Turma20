@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 
-// Simple API route that returns all editions on supabase postgres
+// Rota que pega todas as Edições criadas no banco de dadoss
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
 

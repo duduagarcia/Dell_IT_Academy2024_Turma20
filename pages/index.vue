@@ -1,11 +1,11 @@
-<!-- The first page of the app -->
+<!-- Primeira página da aplicação -->
 <script setup>
 const toast = useToast();
 
-// getting all edicoes from the API
+// Pegando todas as Edições da API
 const { data } = await useFetch("/api/edicao/getAll");
 
-// formatting the data to be displayed in the table
+// Formatando as edições para a tabela
 const edicoes = [];
 data.value.edicoes.forEach((edicao) => {
   edicoes.push({
@@ -22,7 +22,7 @@ function formatDate(date) {
   return new Date(date).toLocaleDateString("pt-BR");
 }
 
-// formated columns for the table
+// Template para as colunas da tabela
 const columns = [
   {
     key: "id",
@@ -51,12 +51,12 @@ const columns = [
 ];
 
 async function createNewEdition() {
-  // calling the API to create a new edicao
+  // Chamando a rota da api para criar uma nova edição
   const { data } = await useFetch("/api/edicao/postNewEdicao", {
     method: "POST",
   });
 
-  // if the API returns a 200 status, redirect to it's page
+  // Se ocorrer tudo bem com a criação, redireciona para a página da edição
   if (data.value.status === 200) {
     const id = data.value.edicao.id;
     toast.add({
@@ -73,7 +73,6 @@ async function createNewEdition() {
   }
 }
 
-// function to select a row in the table and navigate to it's page
 function selectRow(row) {
   navigateTo(`/edicao/${row.id}`);
 }
@@ -95,7 +94,6 @@ function selectRow(row) {
 </template>
 
 <style scoped>
-/* facing a problem with NuxtUI button's size, so added this class to fix it */
 .correction_button {
   width: max-content;
   padding: 12px;

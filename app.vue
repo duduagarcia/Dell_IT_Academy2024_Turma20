@@ -1,4 +1,4 @@
-<!-- Entry point  -->
+<!-- Entry point da aplicação  -->
 <template>
   <div>
     <NuxtPage />

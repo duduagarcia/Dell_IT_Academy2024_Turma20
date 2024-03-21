@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 
+// Rota da API que cria uma nova aposta
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
   const body = await readBody(event);

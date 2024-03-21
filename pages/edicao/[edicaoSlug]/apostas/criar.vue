@@ -1,8 +1,9 @@
+<!-- Página de criação de uma determinada aposta -->
 <script setup>
 const route = useRoute();
 const toast = useToast();
 
-// Form data
+// Dados do formulário
 const state = reactive({
   name: "",
   cpf: "",
@@ -15,8 +16,6 @@ function goBack() {
 }
 
 async function criarAposta() {
-  console.log("SUBMIT", state);
-
   const { data } = await useFetch("/api/aposta/postNewAposta", {
     method: "POST",
     body: JSON.stringify({
@@ -27,6 +26,7 @@ async function criarAposta() {
     }),
   });
 
+  // Após salvar a aposta no banco, zeramos os dados do input para que o usuário possa fazer uma nova aposta
   if (data.value.status === 200) {
     toast.add({
       title: "Aposta criada com sucesso",
@@ -43,11 +43,10 @@ async function criarAposta() {
       color: "red",
     });
   }
-  console.log(data);
 }
 
-// CPF mask and verification for better user experience
-const inputCPF = ref(null); // reference to the HTML element with vue `ref`
+// Máscara de formatação de CPF
+const inputCPF = ref(null);
 function formatCPF() {
   state.cpf = state.cpf.replace(/[^\d]/g, "");
   verifyCPF();
@@ -67,7 +66,7 @@ function verifyCPF() {
   watchFormControl();
 }
 
-// Number input verification and logic to add and remove numbers
+// Lógica do input de números
 const inputNumber = ref(null); // reference to the HTML element with vue `ref`
 const lockNumberChange = ref(true);
 function verifyNumber() {
@@ -97,7 +96,7 @@ function removeNumber(index) {
   watchFormControl();
 }
 
-// Random number generator
+// Gerador de números aleatórios entre 1 e 50
 function surpresinha() {
   state.numbers = [];
   for (let i = 0; i < 5; i++) {
@@ -106,11 +105,12 @@ function surpresinha() {
   watchFormControl();
 }
 
-// Form control verification that will be triggered any functions that change the form data
+// Lógica de controle do formulário, que será ativada sempre que algum input for modificado
 const formControl = ref(false);
 function watchFormControl() {
-  // faced a problem with the CPF mask, so added this verification to ensure that the CPF is valid.
-  // it either has 11 (only numbers ###########) or 14 characters (with the mask ###.###.###-##)
+  // Verifica se todos os campos estão preenchidos nos seus devidos padrões
+
+  // OBS: aqui encontrei um problema com a minha máscara de CPF, que faz com que o tamanho do CPF seja 14 (###.###.###-##) ou 11 (###########)
   if (
     state.name &&
     (state.cpf.length === 11 || state.cpf.length === 14) &&
@@ -123,7 +123,6 @@ function watchFormControl() {
 }
 </script>
 
-<!-- template for a form to register the necessary data -->
 <template>
   <UContainer class="h-screen flex p-8 gap-3 flex-col">
     <div class="flex items-center gap-5">
@@ -131,7 +130,6 @@ function watchFormControl() {
       <h1 class="my-7 text-2xl">Criar aposta</h1>
     </div>
     <div class="max-w-md flex flex-col gap-5">
-      <!-- Input name input name that triggers a verification event (watchFormControl) when it is changed -->
       <UFormGroup label="Nome" required size="xl">
         <input
           class="w-full p-3 outline-none rounded-md input-border"
@@ -141,7 +139,6 @@ function watchFormControl() {
           @input="watchFormControl"
         />
       </UFormGroup>
-      <!-- Input CPF input that triggers a mask function for cpf when it is changed -->
       <UFormGroup label="CPF" required size="xl">
         <input
           class="w-full p-3 outline-none rounded-md input-border"
@@ -153,7 +150,7 @@ function watchFormControl() {
           ref="inputCPF"
         />
       </UFormGroup>
-      <!-- Input number with the necessary logic to ensure that only 5 numbers between 1 and 50 are typed  -->
+
       <UFormGroup
         label="Número"
         required
@@ -181,7 +178,6 @@ function watchFormControl() {
         :class="lockNumberChange ? 'disable' : ''"
       />
 
-      <!-- Selected numbers by the user  -->
       <div class="mb-5">
         <UKbd
           v-for="(number, index) in state.numbers"
@@ -215,7 +211,6 @@ function watchFormControl() {
 </template>
 
 <style scoped>
-/* facing a problem with NuxtUI button's size, so added this class to fix it */
 .correction_button {
   width: max-content;
   padding: 12px;

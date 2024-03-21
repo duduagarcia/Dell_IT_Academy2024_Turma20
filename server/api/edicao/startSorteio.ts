@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 
+// Rota que atualiza o estado da Edição para iniciado o sorteio
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event);
   const body = await readBody(event);

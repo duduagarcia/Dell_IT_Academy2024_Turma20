@@ -1,6 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server";
 
-// API route that returns all apostas with a given edicao_id from supabase postgres
+// Rota da API que retorna todas as apostas relacionadas com uma edição
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
   const body = await readBody(event);
