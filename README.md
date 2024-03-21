@@ -35,6 +35,8 @@ npm install
 npm run dev
 ```
 
+- OBS: O Nuxt utiliza uma server engine chamada Nitro para iniciar o servidor de desenvolvimento, ela pode demorar um pouco para iniciar e, caso você acesse a URL sem ela estar totalmente carrega, é provável que se depare com uma tela preta apenas com o logo do Nuxt. Por favor não se desespere, é normal, apenas espere.
+
 ## Importante
 
 para o projeto rodar localmente sem problemas, no arquivo `.env` estão as chaves para realizar a conexão com o projeto criado exclusivamente para a realização deste exercício técnico do Supabase.
