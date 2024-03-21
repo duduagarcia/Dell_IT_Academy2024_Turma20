@@ -1,3 +1,4 @@
+<!-- Página de uma determinada Edição -->
 <script setup>
 const route = useRoute();
 const toast = useToast();
@@ -6,34 +7,32 @@ function goBackHome() {
   navigateTo("/");
 }
 
+// Pegando todas as apostas da Edição
 let allApostas = await useFetch("/api/aposta/getAll", {
   method: "POST",
   body: JSON.stringify({ edicao_id: route.params.id }),
 });
-
 allApostas = allApostas.data.value.apostas;
 
-console.log("all apostas", allApostas);
-
+// Pegando os dados da edição atual, serve para verificar o status da edição
 let current_edicao = await useFetch("/api/edicao/getCurrentEdicao", {
   method: "POST",
   body: JSON.stringify({ id: route.params.id }),
 });
-
 current_edicao = current_edicao.data.value.edicao[0];
 
-console.log("current_edicao", current_edicao);
+// Caso seja verdade que a edição tenha terminado, fazemos as seguintes operações
 let apostasWinners = [];
 const numbers_wCount = ref([]);
-
 if (current_edicao.finished == true) {
+  // Pegamos as apostas vencedoras
   const { data } = await useFetch("/api/aposta/getWinners", {
     method: "POST",
     body: JSON.stringify({ ids_apostas: current_edicao.winners }),
   });
 
+  // Ordenamos as apostas por ordem alfabética no vetor para visualização na tabela
   apostasWinners = data.value.apostas;
-
   apostasWinners.sort((a, b) => {
     if (a.name < b.name) {
       return -1;
@@ -44,7 +43,7 @@ if (current_edicao.finished == true) {
     return 0;
   });
 
-  // No momento pegamos apenas as apostas vencedoreas, devo pegar todas as apostas do sorteio
+  // Pegamos todos os números escolhidos em TODAS as apostas da edição para posteriormente percorrer e contar a frequência de cada número
   let numbers = [];
   allApostas.forEach((aposta) => {
     aposta.numbers.forEach((number) => {
@@ -59,6 +58,7 @@ if (current_edicao.finished == true) {
     });
   });
 
+  // Percorrendo todos os números escolhidos e contando a frequência de cada um
   numbers_wCount.value.forEach((number) => {
     let count = 0;
     allApostas.forEach((aposta) => {
@@ -73,6 +73,7 @@ if (current_edicao.finished == true) {
   console.log("numbers_wCount", numbers_wCount.value);
 }
 
+// Template para as colunas da tabela de TODAS as apostas feitas
 const columns = [
   {
     key: "id",
@@ -92,6 +93,7 @@ const columns = [
   },
 ];
 
+// Template das colunas de freqência de números
 const columns_numberFrequency = [
   {
     key: "number",
@@ -107,6 +109,7 @@ function criarAposta() {
   navigateTo(`/edicao/${route.params.id}/apostas/criar`);
 }
 
+// Função que atualiza a edição para a fase de sorteio
 async function redirectToSorteio() {
   const { data } = await useFetch("/api/edicao/startSorteio", {
     method: "POST",
@@ -125,12 +128,13 @@ async function redirectToSorteio() {
       description: "Não foi possível iniciar o sorteio",
       color: "red",
     });
+    navigateTo(`/edicao/${route.params.id}/sorteio`);
   }
-
-  navigateTo(`/edicao/${route.params.id}/sorteio`);
 }
 
+// Função chamada ao clicar no botão de iniciar sorteio
 function iniciarSorteio() {
+  // Caso a edição não tenha nenhuma aposta, bloqueamos o usuário de inicair o sorteio e o alertamos
   if (allApostas.length === 0 || allApostas === undefined) {
     toast.add({
       title: "ERRO!",
@@ -140,9 +144,11 @@ function iniciarSorteio() {
     return;
   }
 
+  // Caso a edição já tenha sido iniciada, redirecionamos o usuário para a página de sorteio
   if (current_edicao.started_drawn == true) {
     redirectToSorteio();
   } else {
+    // Caso a edição ainda não tenha sido iniciada, mostramos um alerta para o usuário confirmar se deseja iniciar o sorteio
     toast.add({
       title: "Atenção",
       actions,
@@ -152,6 +158,7 @@ function iniciarSorteio() {
   }
 }
 
+// Objeto para o popup de confirmação de início de sorteio
 const actions = ref([
   {
     label: "Confirmar",
@@ -163,6 +170,7 @@ const actions = ref([
   },
 ]);
 
+// Função chamada ao clicar em uma aposta vencedora para premiação
 function selectWinner(row) {
   console.log("row", row);
   navigateTo(`/edicao/${route.params.id}/apostas/${row.id}/premiacao`);
@@ -207,6 +215,7 @@ function selectWinner(row) {
       <p class="text-lg">Frequência dos números escolhidos</p>
       <UTable :rows="numbers_wCount" :columns="columns_numberFrequency" />
     </div>
+
     <div v-else-if="current_edicao.finished == false">
       <p>Apostas registradas até o momento</p>
       <UTable :rows="allApostas" :columns="columns" />
